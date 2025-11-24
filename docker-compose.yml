@@ -1,0 +1,67 @@
+name: sportime
+
+services:
+  db:
+    image: mariadb:11.4
+    container_name: sportime_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - TZ=America/Santiago
+      - MARIADB_DATABASE=${DB_NAME}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks: [sportime_net]
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: sportime_web
+    command: ["/app/entrypoint.sh"]
+    volumes:
+      - ./web:/app
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+      - ./docker/entrypoint.sh:/app/entrypoint.sh
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=3306
+    depends_on:
+      - db
+    networks: [sportime_net]
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: sportime_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - static_data:/staticfiles
+      - media_data:/media
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web
+    networks: [sportime_net]
+
+volumes:
+  db_data:
+  static_data:
+  media_data:
+
+networks:
+  sportime_net:
+    driver: bridge

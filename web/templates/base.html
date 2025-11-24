@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Sportime{% endblock %}</title>
+  <link href="{% static 'css/landing.css' %}" rel="stylesheet">
+</head>
+<body>
+  <header style="position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(0,0,0,.25);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.08);z-index:10;">
+    <a href="/" style="font-weight:800;color:#fff;text-decoration:none;">sportime</a>
+    <nav style="display:flex;gap:16px;">
+      <a href="/reservas/" style="color:#fff;text-decoration:none;">Reservas</a>
+      <a href="/pagos/" style="color:#fff;text-decoration:none;">Pagos</a>
+      <a href="/fidelizacion/" style="color:#fff;text-decoration:none;">Fidelización</a>
+      <a href="/admin/" style="color:#fff;text-decoration:none;">Admin</a>
+    </nav>
+  </header>
+  <main style="padding-top:72px;">
+    {% block content %}{% endblock %}
+    {% block body %}{% endblock %}
+  </main>
+</body>
+</html>

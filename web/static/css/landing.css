@@ -1,0 +1,89 @@
+:root {
+  --green: #1e7d32;
+  --light-green: #2ecc71;
+  --dark: #0e0e0e;
+  --white: #fff;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(160deg, var(--green), var(--dark));
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  text-align: center;
+}
+
+.hero {
+  max-width: 600px;
+  padding: 2rem;
+}
+
+.brand {
+  font-size: 3rem;
+  font-weight: 800;
+}
+
+.badge-accent {
+  background: var(--light-green);
+  color: var(--dark);
+  padding: .2rem .6rem;
+  border-radius: .3rem;
+  font-weight: 700;
+}
+
+.tagline {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-top: 1rem;
+}
+
+.subtitle {
+  margin-top: 1rem;
+  opacity: .9;
+}
+
+.cta-buttons {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btn-cta, .btn-outline {
+  padding: 0.9rem 1.5rem;
+  font-weight: 700;
+  border-radius: .5rem;
+  text-decoration: none;
+  transition: all .3s ease;
+}
+
+.btn-cta {
+  background: var(--white);
+  color: var(--green);
+}
+
+.btn-cta:hover {
+  background: var(--light-green);
+  color: var(--dark);
+}
+
+.btn-outline {
+  border: 2px solid var(--white);
+  color: var(--white);
+}
+
+.btn-outline:hover {
+  background: var(--light-green);
+  color: var(--dark);
+}
+
+footer {
+  margin-top: 3rem;
+  font-size: 0.9rem;
+  opacity: .7;
+}
