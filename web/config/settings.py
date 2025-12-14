@@ -153,6 +153,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000','http://127.0.0.1:8000']
 
+# Auth (login requerido para reservas/pagos/fidelización)
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/reservas/'
+LOGOUT_REDIRECT_URL = '/'
+
 
 # --- Proyecto: plantillas y estáticos de nivel proyecto ---
 # Busca templates en web/templates

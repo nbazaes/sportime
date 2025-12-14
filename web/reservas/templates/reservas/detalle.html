@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Reserva - Sportime{% endblock %}
+
+{% block content %}
+<section style="max-width:980px;margin:0 auto;padding:24px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+    <h1 style="color:#fff;margin:0;">Detalle de reserva</h1>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a class="btn-cta" href="{% url 'reservas:editar' reserva.pk %}">Editar</a>
+      <a href="{% url 'reservas:eliminar' reserva.pk %}" style="color:#fff;text-decoration:none;">Eliminar</a>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;color:#fff;">
+    <p style="margin:0 0 8px;"><strong>Usuario:</strong> {{ reserva.usuario }}</p>
+    <p style="margin:0 0 8px;"><strong>Cancha:</strong> {{ reserva.cancha }}</p>
+    <p style="margin:0 0 8px;"><strong>Fecha:</strong> {{ reserva.fecha }}</p>
+    <p style="margin:0 0 8px;"><strong>Hora:</strong> {{ reserva.hora }}</p>
+    <p style="margin:0;"><strong>Estado:</strong> {{ reserva.estado }}</p>
+  </div>
+
+  <div style="margin-top:16px;">
+    <a href="{% url 'reservas:lista' %}" style="color:#fff;text-decoration:none;">← Volver</a>
+  </div>
+</section>
+{% endblock %}

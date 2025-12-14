@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Reserva - Sportime{% endblock %}
+
+{% block content %}
+<section style="max-width:980px;margin:0 auto;padding:24px;">
+  <h1 style="color:#fff;margin:0 0 16px;">
+    {% if form.instance.pk %}Editar reserva{% else %}Nueva reserva{% endif %}
+  </h1>
+
+  <form method="post" style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div style="color:#fff;background:rgba(255,0,0,.15);padding:10px 12px;border-radius:8px;margin-bottom:12px;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      <div style="margin-bottom:12px;">
+        <label for="{{ field.id_for_label }}" style="display:block;color:#fff;font-weight:700;margin-bottom:6px;">
+          {{ field.label }}
+        </label>
+        {{ field }}
+        {% if field.errors %}
+          <div style="color:#fff;background:rgba(255,0,0,.15);padding:6px 10px;border-radius:8px;margin-top:6px;">
+            {{ field.errors }}
+          </div>
+        {% endif %}
+        {% if field.help_text %}
+          <div style="color:rgba(255,255,255,.75);font-size:12px;margin-top:6px;">{{ field.help_text }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px;">
+      <button type="submit" class="btn-cta">{% if form.instance.pk %}Guardar cambios{% else %}Reservar{% endif %}</button>
+      <a href="{% url 'reservas:lista' %}" style="color:#fff;text-decoration:none;">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

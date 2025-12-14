@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar pago - Sportime{% endblock %}
+
+{% block content %}
+<section style="max-width:980px;margin:0 auto;padding:24px;">
+  <h1 style="color:#fff;margin:0 0 16px;">Confirmar pago</h1>
+
+  <!-- "Menú contextual" simple para confirmar -->
+  <div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;color:#fff;">
+    <p style="margin:0 0 12px;">Para completar la reserva, confirma el pago de <strong>$5000</strong>.</p>
+
+    <div style="margin:0 0 12px;opacity:.95;">
+      <div><strong>Cancha:</strong> {{ reserva.cancha }}</div>
+      <div><strong>Fecha:</strong> {{ reserva.fecha }}</div>
+      <div><strong>Hora:</strong> {{ reserva.hora }}</div>
+      <div><strong>Estado:</strong> {{ reserva.estado }}</div>
+    </div>
+
+    <form method="post" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      {% csrf_token %}
+      <button type="submit" class="btn-cta">Confirmar pago</button>
+      <a href="{% url 'reservas:lista' %}" style="color:#fff;text-decoration:none;">Volver</a>
+    </form>
+
+    <div style="margin-top:10px;color:rgba(255,255,255,.75);font-size:12px;">
+      Al confirmar: aparecerá en Pagos y sumarás +15 puntos.
+    </div>
+  </div>
+</section>
+{% endblock %}

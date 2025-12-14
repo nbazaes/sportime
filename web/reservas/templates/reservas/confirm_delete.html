@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Reserva - Sportime{% endblock %}
+
+{% block content %}
+<section style="max-width:980px;margin:0 auto;padding:24px;">
+  <h1 style="color:#fff;margin:0 0 16px;">Eliminar reserva</h1>
+
+  <div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;color:#fff;">
+    <p style="margin:0 0 12px;">¿Seguro que quieres eliminar esta reserva?</p>
+    <p style="margin:0 0 12px;opacity:.9;">
+      {{ object }}
+    </p>
+
+    <form method="post" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      {% csrf_token %}
+      <button type="submit" class="btn-cta">Sí, eliminar</button>
+      <a href="{% url 'reservas:lista' %}" style="color:#fff;text-decoration:none;">Cancelar</a>
+    </form>
+  </div>
+</section>
+{% endblock %}
