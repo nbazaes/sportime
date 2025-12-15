@@ -16,6 +16,14 @@
       <a href="/pagos/" style="color:#fff;text-decoration:none;">Pagos</a>
       <a href="/fidelizacion/" style="color:#fff;text-decoration:none;">Fidelización</a>
       <a href="/admin/" style="color:#fff;text-decoration:none;">Admin</a>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" style="display:inline;margin:0;">
+          {% csrf_token %}
+          <button type="submit" style="background:transparent;border:0;padding:0;color:#fff;text-decoration:none;cursor:pointer;">Salir</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}" style="color:#fff;text-decoration:none;">Login</a>
+      {% endif %}
     </nav>
   </header>
   <main style="padding-top:72px;">
