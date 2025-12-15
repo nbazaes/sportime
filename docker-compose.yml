@@ -5,14 +5,12 @@ services:
     image: mariadb:11.4
     container_name: sportime_db
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
-      - TZ=America/Santiago
-      - MARIADB_DATABASE=${DB_NAME}
-      - MARIADB_USER=${DB_USER}
-      - MARIADB_PASSWORD=${DB_PASSWORD}
-      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - TZ=${TZ:-America/Santiago}
+      - MARIADB_DATABASE=${DB_NAME:-sportime}
+      - MARIADB_USER=${DB_USER:-sportime}
+      - MARIADB_PASSWORD=${DB_PASSWORD:-sportime123}
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root123}
     volumes:
       - db_data:/var/lib/mysql
     networks: [sportime_net]
@@ -22,22 +20,23 @@ services:
       context: ./web
       dockerfile: Dockerfile
     container_name: sportime_web
-    command: ["/app/entrypoint.sh"]
+    command: ["bash", "/app/entrypoint.sh"]
     volumes:
       - ./web:/app
       - static_data:/app/staticfiles
       - media_data:/app/media
-      - ./docker/entrypoint.sh:/app/entrypoint.sh
-    env_file:
-      - .env
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=${DEBUG}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY:-dev-super-secreto-cambialo}
+      - DEBUG=${DEBUG:-1}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME:-}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD:-}
+      - DB_NAME=${DB_NAME:-sportime}
+      - DB_USER=${DB_USER:-sportime}
+      - DB_PASSWORD=${DB_PASSWORD:-sportime123}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root123}
       - DB_HOST=db
       - DB_PORT=3306
     depends_on:
