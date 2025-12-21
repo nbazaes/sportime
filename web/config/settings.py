@@ -180,3 +180,7 @@ except Exception:
 # Toma los estáticos del proyecto (web/static) además de los de cada app
 if 'STATICFILES_DIRS' not in globals():
     STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Pruebas para producción sin HTTPS (desactivar al conseguir el certificado)
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
