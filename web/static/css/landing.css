@@ -65,6 +65,8 @@ body {
 .btn-cta {
   background: var(--white);
   color: var(--green);
+  border: 0;
+  cursor: pointer;
 }
 
 .btn-cta:hover {
@@ -75,6 +77,8 @@ body {
 .btn-outline {
   border: 2px solid var(--white);
   color: var(--white);
+  background: transparent;
+  cursor: pointer;
 }
 
 .btn-outline:hover {

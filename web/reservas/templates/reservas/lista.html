@@ -12,6 +12,7 @@
         <table class="table table-striped table-dark align-middle mb-0">
           <thead>
             <tr>
+              <th>#</th>
               <th>Usuario</th>
               <th>Cancha</th>
               <th>Fecha</th>
@@ -23,15 +24,29 @@
           <tbody>
             {% for r in reservas %}
             <tr>
+              <td>#{{ r.id }}</td>
               <td>{{ r.usuario }}</td>
               <td>{{ r.cancha }}</td>
-              <td>{{ r.fecha }}</td>
-              <td>{{ r.hora }}</td>
+              <td>{{ r.fecha|date:"d/m/Y" }}</td>
+              <td>{{ r.hora|time:"H:i" }}</td>
               <td><span class="badge text-bg-secondary">{{ r.estado }}</span></td>
               <td class="text-end" style="white-space:nowrap;">
                 <a href="{% url 'reservas:detalle' r.pk %}" class="btn btn-sm btn-outline-light">Ver</a>
                 <a href="{% url 'reservas:editar' r.pk %}" class="btn btn-sm btn-outline-light">Editar</a>
-                <a href="{% url 'reservas:eliminar' r.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                <form
+                  method="post"
+                  action="{% url 'reservas:eliminar' r.pk %}"
+                  data-swal-confirm="1"
+                  data-swal-title="¿Eliminar reserva?"
+                  data-swal-text="Esta acción no se puede deshacer."
+                  data-swal-icon="warning"
+                  data-swal-confirm-text="Sí, eliminar"
+                  data-swal-cancel-text="Cancelar"
+                  style="display:inline;"
+                >
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                </form>
               </td>
             </tr>
             {% empty %}

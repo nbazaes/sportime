@@ -5,10 +5,23 @@
 {% block content %}
 <section style="max-width:980px;margin:0 auto;padding:24px;">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
-    <h1 style="color:#fff;margin:0;">Detalle de reserva</h1>
+    <h1 style="color:#fff;margin:0;">Detalle de reserva - #{{ reserva.id }}</h1>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <a class="btn-cta" href="{% url 'reservas:editar' reserva.pk %}">Editar</a>
-      <a href="{% url 'reservas:eliminar' reserva.pk %}" style="color:#fff;text-decoration:none;">Eliminar</a>
+      <form
+        method="post"
+        action="{% url 'reservas:eliminar' reserva.pk %}"
+        data-swal-confirm="1"
+        data-swal-title="¿Eliminar reserva?"
+        data-swal-text="Esta acción no se puede deshacer."
+        data-swal-icon="warning"
+        data-swal-confirm-text="Sí, eliminar"
+        data-swal-cancel-text="Cancelar"
+        style="display:inline;margin:0;"
+      >
+        {% csrf_token %}
+        <button type="submit" class="btn-cta">Eliminar</button>
+      </form>
     </div>
   </div>
 

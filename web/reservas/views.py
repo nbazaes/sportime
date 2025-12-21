@@ -48,6 +48,26 @@ class ReservaCreateView(LoginRequiredMixin, CreateView):
         kwargs["user"] = getattr(self.request, "user", None)
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request = self.request
+        descuento_id = request.session.get('descuento_redimido_id')
+        contexto_desc = None
+        if descuento_id:
+            from fidelizacion.models import DescuentoRedimido
+            red = DescuentoRedimido.objects.filter(id=descuento_id, usuario=request.user, reserva_num__isnull=True).first()
+            if red:
+                monto_base = 5000
+                monto_desc = int(monto_base * (100 - red.porcentaje) / 100)
+                contexto_desc = {
+                    'porcentaje': red.porcentaje,
+                    'monto_base': monto_base,
+                    'monto_desc': monto_desc,
+                }
+
+        context['descuento_pending'] = contexto_desc
+        return context
+
     def form_valid(self, form):
         user = getattr(self.request, "user", None)
         if user is not None and getattr(user, "is_authenticated", False) and not getattr(
@@ -92,8 +112,8 @@ class ReservaUpdateView(LoginRequiredMixin, UpdateView):
 
 class ReservaDeleteView(LoginRequiredMixin, DeleteView):
     model = Reserva
-    template_name = "reservas/confirm_delete.html"
     success_url = reverse_lazy("reservas:lista")
+    http_method_names = ["post"]
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -122,22 +142,43 @@ class ReservaConfirmarPagoView(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
         from django.db import transaction
 
-        from fidelizacion.models import PuntosFidelizacion
+        from fidelizacion.models import PuntosFidelizacion, DescuentoRedimido
         from pagos.models import Pago
 
         self.object = self.get_object()
 
         user = request.user
+        # Check for a pending redemption in session
+        descuento_id = request.session.pop('descuento_redimido_id', None)
+
         with transaction.atomic():
+            porcentaje = None
+            if descuento_id:
+                red = DescuentoRedimido.objects.filter(id=descuento_id, usuario=user, reserva_num__isnull=True).first()
+                if red:
+                    porcentaje = red.porcentaje
+
+            monto_base = 5000
+            if porcentaje:
+                monto = int(monto_base * (100 - porcentaje) / 100)
+            else:
+                monto = monto_base
+
             pago, created = Pago.objects.get_or_create(
                 reserva=self.object,
                 defaults={
                     "usuario": user,
-                    "monto": 5000,
+                    "monto": monto,
                     "metodo": "WebPay Sandbox",
                     "estado": "aprobado",
+                    "reserva_num": self.object.id,
                 },
             )
+
+            # If redemption was applied, mark it with reserva_num
+            if descuento_id and red and created:
+                red.reserva_num = self.object.id
+                red.save()
 
             # Sumar puntos solo la primera vez que se confirma el pago
             if created:
@@ -146,3 +187,26 @@ class ReservaConfirmarPagoView(LoginRequiredMixin, DetailView):
                 puntos.save()
 
         return HttpResponseRedirect(reverse("pagos:lista"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        request = self.request
+        from fidelizacion.models import DescuentoRedimido
+        descuento_id = request.session.get('descuento_redimido_id')
+        contexto_desc = None
+        if descuento_id:
+            try:
+                red = DescuentoRedimido.objects.filter(id=descuento_id, usuario=request.user, reserva_num__isnull=True).first()
+                if red:
+                    monto_base = 5000
+                    monto_desc = int(monto_base * (100 - red.porcentaje) / 100)
+                    contexto_desc = {
+                        'porcentaje': red.porcentaje,
+                        'monto_base': monto_base,
+                        'monto_desc': monto_desc,
+                    }
+            except Exception:
+                contexto_desc = None
+
+        context['descuento_pending'] = contexto_desc
+        return context

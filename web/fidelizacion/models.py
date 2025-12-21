@@ -9,3 +9,14 @@ class PuntosFidelizacion(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.puntos_acumulados} pts"
+
+
+class DescuentoRedimido(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    porcentaje = models.PositiveIntegerField()
+    puntos_usados = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    reserva_num = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.porcentaje}% - {self.puntos_usados} pts"

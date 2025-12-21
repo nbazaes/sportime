@@ -8,8 +8,24 @@
     {% if form.instance.pk %}Editar reserva{% else %}Nueva reserva{% endif %}
   </h1>
 
-  <form method="post" style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;">
+  <form
+    method="post"
+    data-swal-confirm="1"
+    data-swal-title="¿Confirmar reserva?"
+    data-swal-text="Revisa fecha y hora. Luego confirmarás el pago de $5000 y sumarás +15 puntos."
+    data-swal-icon="question"
+    data-swal-confirm-text="Sí, reservar"
+    data-swal-cancel-text="Cancelar"
+    style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;"
+  >
     {% csrf_token %}
+
+    {% if descuento_pending %}
+      <div style="margin-bottom:12px;padding:10px;border-radius:8px;background:rgba(0,128,0,0.08);border:1px solid rgba(0,128,0,0.15);color:#e6ffed;">
+        <strong>Descuento aplicado:</strong>
+        <span style="margin-left:8px;">{{ descuento_pending.porcentaje }}% — Precio: <s>${{ descuento_pending.monto_base }}</s> <strong>${{ descuento_pending.monto_desc }}</strong></span>
+      </div>
+    {% endif %}
 
     {% if form.non_field_errors %}
       <div style="color:#fff;background:rgba(255,0,0,.15);padding:10px 12px;border-radius:8px;margin-bottom:12px;">

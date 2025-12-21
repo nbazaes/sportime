@@ -6,7 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Sportime{% endblock %}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="{% static 'css/sweetalert2-bulma.min.css' %}" rel="stylesheet">
   <link href="{% static 'css/landing.css' %}" rel="stylesheet">
+  <style>
+    /* Small override to ensure SweetAlert2 buttons look like Bulma even if theme is blocked */
+    .swal2-container .swal2-popup .swal2-confirm {
+      background-color: hsl(171, 100%, 41%) !important;
+      color: #fff !important;
+      border: 0 !important;
+      border-radius: 4px !important;
+      padding: .45rem .9rem !important;
+    }
+    .swal2-container .swal2-popup .swal2-cancel {
+      background-color: #fff !important;
+      color: #111 !important;
+      border: 1px solid #dddddd !important;
+      border-radius: 4px !important;
+      padding: .45rem .9rem !important;
+    }
+  </style>
 </head>
 <body>
   <header style="position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(0,0,0,.25);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.08);z-index:10;">
@@ -17,12 +35,23 @@
       <a href="/fidelizacion/" style="color:#fff;text-decoration:none;">Fidelización</a>
       <a href="/admin/" style="color:#fff;text-decoration:none;">Admin</a>
       {% if user.is_authenticated %}
-        <form method="post" action="{% url 'logout' %}" style="display:inline;margin:0;">
+        <form
+          method="post"
+          action="{% url 'logout' %}"
+          data-swal-confirm="1"
+          data-swal-title="¿Cerrar sesión?"
+          data-swal-text="¿Estás seguro que quieres cerrar sesión?"
+          data-swal-icon="question"
+          data-swal-confirm-text="Sí, cerrar sesión"
+          data-swal-cancel-text="Cancelar"
+          style="display:inline;margin:0;"
+        >
           {% csrf_token %}
-          <button type="submit" style="background:transparent;border:0;padding:0;color:#fff;text-decoration:none;cursor:pointer;">Salir</button>
+          <button type="submit" class="btn btn-sm btn-outline-light">Salir</button>
         </form>
       {% else %}
-        <a href="{% url 'login' %}" style="color:#fff;text-decoration:none;">Login</a>
+        <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-sm btn-light" style="margin-left:8px;">Registrarse</a>
       {% endif %}
     </nav>
   </header>
@@ -30,5 +59,41 @@
     {% block content %}{% endblock %}
     {% block body %}{% endblock %}
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+  <script>
+
+    document.addEventListener("submit", function (e) {
+      if (window.SPORTIME_DISABLE_GLOBAL_CONFIRM) return;
+      const form = e.target;
+      if (!(form instanceof HTMLFormElement)) return;
+
+      if (form.dataset.swalConfirm !== "1") return;
+      if (form.dataset.swalConfirmed === "1") return;
+
+      e.preventDefault();
+
+      const title = form.dataset.swalTitle || "¿Confirmar?";
+      const text = form.dataset.swalText || "";
+      const icon = form.dataset.swalIcon || "question";
+      const confirmButtonText = form.dataset.swalConfirmText || "Sí, confirmar";
+      const cancelButtonText = form.dataset.swalCancelText || "Cancelar";
+
+      Swal.fire({
+        ...window.SPORTIME_SWAL_DEFAULTS,
+        title,
+        text,
+        icon,
+        showCancelButton: true,
+        confirmButtonText,
+        cancelButtonText,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          form.dataset.swalConfirmed = "1";
+          form.submit();
+        }
+      });
+    });
+  </script>
 </body>
 </html>

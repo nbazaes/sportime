@@ -12,7 +12,16 @@
       {{ object }}
     </p>
 
-    <form method="post" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <form
+      method="post"
+      data-swal-confirm="1"
+      data-swal-title="¿Eliminar reserva?"
+      data-swal-text="Esta acción no se puede deshacer."
+      data-swal-icon="warning"
+      data-swal-confirm-text="Sí, eliminar"
+      data-swal-cancel-text="Cancelar"
+      style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;"
+    >
       {% csrf_token %}
       <button type="submit" class="btn-cta">Sí, eliminar</button>
       <a href="{% url 'reservas:lista' %}" style="color:#fff;text-decoration:none;">Cancelar</a>

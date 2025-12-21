@@ -13,6 +13,7 @@
             <tr>
               <th>ID</th>
               <th>Usuario</th>
+              <th>Reserva</th>
               <th>Monto</th>
               <th>Método</th>
               <th>Estado</th>
@@ -23,12 +24,26 @@
             <tr>
               <td>#{{ p.id }}</td>
               <td>{{ p.usuario }}</td>
-              <td>${{ p.monto }}</td>
+              <td>{% if p.reserva_num %}#{{ p.reserva_num }}{% elif p.reserva %}#{{ p.reserva.id }}{% else %}-{% endif %}</td>
+              <td>{{ p.fecha_pago|date:"H:i" }}</td>
+              <td>
+                {% if p.monto < 0 %}
+                  <span class="text-danger fw-bold">${{ p.monto }}</span>
+                {% else %}
+                  ${{ p.monto }}
+                {% endif %}
+              </td>
               <td>{{ p.metodo }}</td>
-              <td><span class="badge text-bg-success">{{ p.estado }}</span></td>
+              <td>
+                {% if p.monto < 0 %}
+                  <span class="badge text-bg-danger">{{ p.estado }}</span>
+                {% else %}
+                  <span class="badge text-bg-success">{{ p.estado }}</span>
+                {% endif %}
+              </td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" class="text-center">Sin pagos</td></tr>
+            <tr><td colspan="6" class="text-center">Sin pagos</td></tr>
             {% endfor %}
           </tbody>
         </table>

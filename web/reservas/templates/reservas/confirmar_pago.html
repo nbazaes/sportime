@@ -3,29 +3,62 @@
 {% block title %}Confirmar pago - Sportime{% endblock %}
 
 {% block content %}
-<section style="max-width:980px;margin:0 auto;padding:24px;">
-  <h1 style="color:#fff;margin:0 0 16px;">Confirmar pago</h1>
+<form id="confirmarPagoForm" method="post" style="display:none;">
+  {% csrf_token %}
+</form>
 
-  <!-- "Menú contextual" simple para confirmar -->
-  <div style="background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;color:#fff;">
-    <p style="margin:0 0 12px;">Para completar la reserva, confirma el pago de <strong>$5000</strong>.</p>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("confirmarPagoForm");
+    if (!form) return;
 
-    <div style="margin:0 0 12px;opacity:.95;">
-      <div><strong>Cancha:</strong> {{ reserva.cancha }}</div>
-      <div><strong>Fecha:</strong> {{ reserva.fecha }}</div>
-      <div><strong>Hora:</strong> {{ reserva.hora }}</div>
-      <div><strong>Estado:</strong> {{ reserva.estado }}</div>
-    </div>
+    // Disable the global form-confirm handler so only this detailed dialog shows
+    window.SPORTIME_DISABLE_GLOBAL_CONFIRM = true;
 
-    <form method="post" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-      {% csrf_token %}
-      <button type="submit" class="btn-cta">Confirmar pago</button>
-      <a href="{% url 'reservas:lista' %}" style="color:#fff;text-decoration:none;">Volver</a>
-    </form>
+    const resumen = [
+      '<div style="text-align:left">',
+      '<div><strong>Reserva:</strong> #{{ reserva.id }}</div>',
+      '<div><strong>Cancha:</strong> {{ reserva.cancha|escapejs }}</div>',
+      '<div><strong>Fecha:</strong> {{ reserva.fecha|date:"d/m/Y"|escapejs }}</div>',
+      '<div><strong>Hora:</strong> {{ reserva.hora|time:"H:i"|escapejs }}</div>',
+      '</div>',
+    ].join('');
 
-    <div style="margin-top:10px;color:rgba(255,255,255,.75);font-size:12px;">
-      Al confirmar: aparecerá en Pagos y sumarás +15 puntos.
-    </div>
-  </div>
-</section>
+    {% if descuento_pending %}
+    const precio_base = {{ descuento_pending.monto_base }};
+    const precio_desc = {{ descuento_pending.monto_desc }};
+    const porcentaje = {{ descuento_pending.porcentaje }};
+    {% else %}
+    const precio_base = 5000;
+    const precio_desc = 5000;
+    const porcentaje = null;
+    {% endif %}
+
+    const detallesPago = [];
+    if (porcentaje) {
+      detallesPago.push(`<p>Para completar la reserva, confirma el pago de <strong><s>$${precio_base}</s> $${precio_desc}</strong> (${porcentaje}% descuento aplicado).</p>`);
+    } else {
+      detallesPago.push(`<p>Para completar la reserva, confirma el pago de <strong>$${precio_desc}</strong>.</p>`);
+    }
+    detallesPago.push('<p>Al confirmar: aparecerá en Pagos y sumarás <strong>+15 puntos</strong>.</p>');
+
+    Swal.fire({
+      ...window.SPORTIME_SWAL_DEFAULTS,
+      title: "Confirmar pago",
+      html: detallesPago.join('') + resumen,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      // Re-enable global confirmations after user makes a choice
+      window.SPORTIME_DISABLE_GLOBAL_CONFIRM = false;
+      if (result.isConfirmed) {
+        form.submit();
+      } else {
+        window.location.href = "{% url 'reservas:lista' %}";
+      }
+    });
+  });
+</script>
 {% endblock %}

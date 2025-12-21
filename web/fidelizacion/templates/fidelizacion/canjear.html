@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="h3 text-white">Canjear Puntos</h1>
+      <p class="text-white">Tienes <strong>{{ puntos }}</strong> puntos</p>
+
+      <form id="canjearForm" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label text-white">Opciones</label>
+          <div>
+            {% for opcion in opciones %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="opcion" id="opcion{{ forloop.counter0 }}" value="{{ forloop.counter0 }}" data-puntos="{{ opcion.puntos }}">
+                <label class="form-check-label text-white" for="opcion{{ forloop.counter0 }}">Canjear {{ opcion.puntos }} pts → {{ opcion.porcentaje }}% descuento</label>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Canjear y reservar</button>
+          <a class="btn btn-light" href="{% url 'fidelizacion:cancelar' %}">Volver</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    const form = document.getElementById('canjearForm');
+    if (!form) return;
+    form.addEventListener('submit', function(e){
+      const puntosDisponibles = parseInt("{{ puntos|default:'0' }}", 10);
+      const opcion = form.querySelector('input[name="opcion"]:checked');
+      if (!opcion) {
+        e.preventDefault();
+        Swal.fire({
+          ...window.SPORTIME_SWAL_DEFAULTS,
+          title: 'Selecciona una opción',
+          icon: 'warning',
+          confirmButtonText: 'Ok'
+        });
+        return;
+      }
+      const needed = parseInt(opcion.dataset.puntos || '0', 10);
+      if (puntosDisponibles < needed) {
+        e.preventDefault();
+        Swal.fire({
+          ...window.SPORTIME_SWAL_DEFAULTS,
+          title: 'No tienes puntos suficientes',
+          text: `Necesitas ${needed} pts, pero tienes ${puntosDisponibles} pts.`,
+          icon: 'error',
+          confirmButtonText: 'Entendido'
+        });
+      }
+    });
+  });
+</script>
+{% endblock %}
