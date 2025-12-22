@@ -38,10 +38,8 @@ def canjear(request):
             messages.error(request, 'No tienes suficientes puntos')
             return redirect('fidelizacion:lista')
 
-        # Deduct points and create redemption
-        puntos_obj.puntos_acumulados -= opcion['puntos']
-        puntos_obj.save()
-
+        # Create a pending redemption but do NOT deduct points yet.
+        # Points will be deducted only when the reservation is confirmed.
         red = DescuentoRedimido.objects.create(
             usuario=request.user,
             porcentaje=opcion['porcentaje'],
@@ -58,6 +56,12 @@ def canjear(request):
 @login_required
 def cancelar(request):
     # Clear any pending redemption in session when user cancels
-    request.session.pop('descuento_redimido_id', None)
+    descuento_id = request.session.pop('descuento_redimido_id', None)
+    if descuento_id:
+        # remove the pending redemption record as it wasn't used
+        try:
+            DescuentoRedimido.objects.filter(id=descuento_id, usuario=request.user, reserva_num__isnull=True).delete()
+        except Exception:
+            pass
     messages.info(request, 'Canje cancelado')
     return redirect('fidelizacion:lista')

@@ -180,6 +180,18 @@ class ReservaConfirmarPagoView(LoginRequiredMixin, DetailView):
                 red.reserva_num = self.object.id
                 red.save()
 
+            # If redemption was applied, deduct the user's points now (only once)
+            if descuento_id and red and created:
+                try:
+                    puntos_obj, _ = PuntosFidelizacion.objects.get_or_create(usuario=user)
+                    # only deduct if they still have enough points (safety)
+                    if puntos_obj.puntos_acumulados >= red.puntos_usados:
+                        puntos_obj.puntos_acumulados -= red.puntos_usados
+                        puntos_obj.save()
+                except Exception:
+                    # don't block payment flow on points errors
+                    pass
+
             # Sumar puntos solo la primera vez que se confirma el pago
             if created:
                 puntos, _ = PuntosFidelizacion.objects.get_or_create(usuario=user)

@@ -25,6 +25,24 @@
       padding: .45rem .9rem !important;
     }
   </style>
+  
+  <style>
+    /* Estilos para botón flotante y modal de feedback */
+    .feedback-btn { position: fixed; right: 18px; bottom: 18px; width: 56px; height: 56px; border-radius: 50%; background: #17b878; color: #fff; display:flex;align-items:center;justify-content:center;border:0;box-shadow:0 6px 18px rgba(0,0,0,.25);font-size:24px;z-index:1000; }
+    .feedback-modal-overlay { display:none; position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:1001;padding:16px; }
+    .feedback-modal-overlay.open { display:flex; }
+    .feedback-modal { background:#fff;border-radius:10px;max-width:520px;width:100%;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.3); }
+    .feedback-modal h3 { margin-top:0;margin-bottom:8px;font-size:18px;color:#111 }
+    .feedback-modal .field { margin-bottom:8px }
+    .feedback-modal label { display:block;font-size:13px;margin-bottom:4px;color:#333 }
+    .feedback-modal input[type="text"], .feedback-modal input[type="email"], .feedback-modal textarea { width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:14px }
+    .feedback-modal .actions { display:flex;gap:8px;justify-content:flex-end;margin-top:12px }
+    .feedback-modal .btn { display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:8px 12px;border-radius:6px;border:0;cursor:pointer }
+    .feedback-modal .btn:focus { outline:2px solid rgba(23,162,184,0.25);outline-offset:2px }
+    .feedback-modal .btn-close { background:#e9ecef;color:#111 }
+    .feedback-modal .btn-send { background:#17a2b8;color:#fff }
+    .feedback-modal .btn-close, .feedback-modal .btn-send { min-width:84px }
+  </style>
 </head>
 <body>
   <header style="position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(0,0,0,.25);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.08);z-index:10;">
@@ -60,6 +78,33 @@
     {% block content %}{% endblock %}
     {% block body %}{% endblock %}
   </main>
+  <!-- Botón flotante y modal de feedback (insertado dentro del body para que scripts funcionen) -->
+  <button id="feedbackBtn" class="feedback-btn" aria-label="Enviar feedback">✉️</button>
+
+  <div id="feedbackModal" class="feedback-modal-overlay" aria-hidden="true">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+      <h3 id="feedbackTitle">Enviar feedback</h3>
+      <form id="feedbackForm">
+        <div class="field">
+          <label for="fb-name">Nombre (opcional)</label>
+          <input id="fb-name" name="name" type="text" placeholder="Tu nombre">
+        </div>
+        <div class="field">
+          <label for="fb-email">Email (opcional)</label>
+          <input id="fb-email" name="email" type="email" placeholder="tu@correo.com">
+        </div>
+        <div class="field">
+          <label for="fb-message">Mensaje</label>
+          <textarea id="fb-message" name="message" rows="4" placeholder="Cuéntanos qué pasó" required></textarea>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-close" id="fbClose">Cerrar</button>
+          <button type="submit" class="btn btn-send">Enviar</button>
+        </div>
+        <div id="fbStatus" style="display:none;margin-top:8px;font-size:14px;color:green">Gracias — (simulación, no se envía)</div>
+      </form>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
   <script>
@@ -134,6 +179,52 @@
       .site-nav form button { color: #fff; }
       .nav-burger { display: block !important; }
     }
-  </style>
+      /* Estilos para botón flotante y modal de feedback (adicionales en head) */
+      @media (max-width: 420px) {
+        .feedback-btn { right: 12px; bottom: 12px; width:50px;height:50px;font-size:20px }
+      }
+    </style>
+
+    <script>
+      (function(){
+        const feedbackBtn = document.getElementById('feedbackBtn');
+        const feedbackModal = document.getElementById('feedbackModal');
+        const fbClose = document.getElementById('fbClose');
+        const fbForm = document.getElementById('feedbackForm');
+        const fbStatus = document.getElementById('fbStatus');
+
+        function openModal(){
+          feedbackModal.classList.add('open');
+          feedbackModal.setAttribute('aria-hidden','false');
+          // focus
+          const msg = document.getElementById('fb-message');
+          if(msg) msg.focus();
+        }
+        function closeModal(){
+          feedbackModal.classList.remove('open');
+          feedbackModal.setAttribute('aria-hidden','true');
+          fbStatus.style.display = 'none';
+        }
+
+        if(feedbackBtn && feedbackModal){
+          feedbackBtn.addEventListener('click', openModal);
+          fbClose.addEventListener('click', closeModal);
+          feedbackModal.addEventListener('click', function(e){
+            if(e.target === feedbackModal) closeModal();
+          });
+
+          fbForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            // No enviar realmente — mostrar estado y cerrar tras un momento
+            fbStatus.style.display = 'block';
+            fbStatus.textContent = 'Gracias — (simulación, no se envía)';
+            setTimeout(function(){
+              closeModal();
+              fbForm.reset();
+            }, 1000);
+          });
+        }
+      })();
+    </script>
 </body>
 </html>
