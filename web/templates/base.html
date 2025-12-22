@@ -29,7 +29,8 @@
 <body>
   <header style="position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(0,0,0,.25);backdrop-filter:blur(6px);border-bottom:1px solid rgba(255,255,255,.08);z-index:10;">
     <a href="/" style="font-weight:800;color:#fff;text-decoration:none;">sportime</a>
-    <nav style="display:flex;gap:16px;">
+    <button id="navBurger" class="nav-burger" aria-label="Abrir menú" style="display:none;background:transparent;border:0;color:#fff;font-size:24px;padding:4px;">☰</button>
+    <nav id="siteNav" class="site-nav" style="display:flex;gap:16px;">
       <a href="/reservas/" style="color:#fff;text-decoration:none;">Reservas</a>
       <a href="/pagos/" style="color:#fff;text-decoration:none;">Pagos</a>
       <a href="/fidelizacion/" style="color:#fff;text-decoration:none;">Fidelización</a>
@@ -95,5 +96,44 @@
       });
     });
   </script>
+  <script>
+    (function(){
+      // Responsivo: botón hamburguesa para pantallas pequeñas
+      const burger = document.getElementById('navBurger');
+      const siteNav = document.getElementById('siteNav');
+
+      function updateNavDisplay(){
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if(isMobile){
+          burger.style.display = 'block';
+          siteNav.classList.remove('open');
+        } else {
+          burger.style.display = 'none';
+          siteNav.classList.remove('open');
+        }
+      }
+
+      if(burger && siteNav){
+        burger.addEventListener('click', function(){
+          siteNav.classList.toggle('open');
+        });
+        // cerrar al cambiar tamaño
+        window.addEventListener('resize', updateNavDisplay);
+        // init
+        updateNavDisplay();
+      }
+    })();
+  </script>
+  <style>
+    /* Estilos para mostrar/ocultar menú en móvil */
+    @media (max-width: 768px) {
+      header { padding: 0 12px; }
+      .site-nav { display: none !important; position: absolute; top: 56px; right: 8px; background: rgba(0,0,0,0.92); padding: 12px; flex-direction: column; gap: 8px; border-radius: 8px; z-index: 11; }
+      .site-nav.open { display: flex !important; }
+      .site-nav a, .site-nav form { color: #fff; }
+      .site-nav form button { color: #fff; }
+      .nav-burger { display: block !important; }
+    }
+  </style>
 </body>
 </html>
